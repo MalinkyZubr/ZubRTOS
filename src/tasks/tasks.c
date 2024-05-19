@@ -6,11 +6,12 @@ uint8_t calculate_task_ticks_execution(uint8_t priority) {
     return ticks_per_execution;
 }
 
-TaskRuntimeData generate_runtime_data(int execution_count, int current_execution_ticks, int ticks_from_last_execution, ReturnFlag return_flag) {
+TaskRuntimeData generate_runtime_data(int execution_count, int current_execution_ticks, int ticks_from_last_execution, int adjusted_priority, ReturnFlag return_flag) {
     TaskRuntimeData runtime_data;
     runtime_data.execution_count = execution_count;
     runtime_data.current_execution_ticks = current_execution_ticks;
     runtime_data.ticks_from_last_execution = ticks_from_last_execution;
+    runtime_data.adjusted_priority = adjusted_priority
     runtime_data.state = TASK_CREATED;
 }
 
@@ -31,7 +32,7 @@ Task *generate_task(const uint8_t priority, const int tick_interval, const Opera
     to_return->max_executions = max_executions;
     to_return->ticks_per_execution = calculate_ticks_execution(priority);
 
-    to_return->runtime_data = generate_runtime_data(0, 0, 0, TASK_CREATED);
+    to_return->runtime_data = generate_runtime_data(0, 0, 0, priority, TASK_CREATED);
     to_return->repeat = repeat;
     return to_return;
 }
@@ -104,13 +105,15 @@ void pi_tree_run_task(TaskManager *task_manager) { // WIP
 
 void pi_queue_sort(TaskManager *task_manager) { // what about if the next has to be null?
     if(selected_task->root_task != NULL) {
-        Task *selected_task = task_manager->root_task
+        Task *selected_task = task_manager->root_task;
+        Task *maximum_priority_task = selected_task;
         Task *former_higher_priority;
+
 
         while(selected_task != NULL) {
             selected_task = selected_task->higher_priority;
 
-            while(selected_task->higher_priority != NULL && selected_task->priority > selected_task->higher_priority->priority) {// must append to the start of the linked list queue
+            while(selected_task->higher_priority != NULL && selected_task->runtime_data.adjusted_priority > selected_task->higher_priority->runtime_data.adjusted_priority) {// must append to the start of the linked list queue
                 former_higher_priority = selected_task->higher_priority;
 
                 selected_task->lower_priority->higher_priority = former_higher_priority;
@@ -121,7 +124,13 @@ void pi_queue_sort(TaskManager *task_manager) { // what about if the next has to
 
                 former_higher_priority->higher_priority = selected_task;
             }
+
+            if(selected_task->runtime_data.adjusted_priority > maximum_priority_task->runtime_data.adjusted_priority) {
+                maximum_priority_task = selected_task
+            }
         }
+
+        task_manager->highest_priority = maximum_priority_task;
     }
 }
 

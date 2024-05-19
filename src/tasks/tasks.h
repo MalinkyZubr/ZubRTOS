@@ -23,6 +23,8 @@ typedef struct TaskRuntimeData {
     int current_execution_ticks;
     int ticks_from_last_execution; // 
     int ticks_from_last_action; // ticks since the task last occupied a single tick
+    int adjusted_priority;
+
     ReturnFlag state;
 } Task;
 
@@ -45,6 +47,7 @@ typedef struct TaskManager {
     int ticks_from_resort; // ticks since adjusted priorities were calculated and resorted
     int resort_threshold; // the number of ticks that should elapse before recalculation of priorities and resorting.
     Task *root_task = NULL
+    Task *highest_priority = NULL;
 } TaskManager;
 
 TaskRuntimeData generate_task_runtime_data(int execution_count, int current_execution_ticks, int ticks_from_last_execution, ReturnFlag return_flag);
