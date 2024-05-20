@@ -37,21 +37,33 @@ typedef struct Task {
     const int ticks_per_execution; // how many ticks is the task allowed to use in a single execution?
     const uint8_t repeat; 
 
-    TaskRuntimeData runtime_data;
+    AssociatedNodes associated_nodes;
 
-    Task *lower_priority = NULL;
-    Task *higher_priority = NULL;
+    TaskRuntimeData runtime_data;
 } Task;
 
+
+typedef struct AssociatedNodes {
+    TaskNode* first_association;
+} AssociatedNodes;
+
+
+typedef struct TaskNode {
+    Task *lower_priority = nullptr;
+    Task *higher_priority = nullptr;
+    Task *owned_task = nullptr;
+} TaskNode;
+
+
 typedef struct TaskQueue {
-    Task *lowest_priority = NULL;
-    Task *highest_priority = NULL;
+    TaskNode *lowest_priority = nullptr;
+    TaskNode *highest_priority = nullptr;
 } TaskQueue;
 
 typedef struct TaskManager {
     int ticks_from_resort = 0; // ticks since adjusted priorities were calculated and resorted
     int resort_threshold = TMC_RESORT_THRESHOLD; // the number of ticks that should elapse before recalculation of priorities and resorting.
-    Task *currently_occupied = NULL;
+    TaskNode *currently_occupied = nullptr;
     TaskQueue task_queue;
 } TaskManager;
 
@@ -75,9 +87,13 @@ int dynamic_task_priority_calculator(Task *task);
 
 void pi_queue_sort(TaskQueue *task_queue);
 
-void pi_queue_add_task(Task *task, TaskQueue *task_queue);
+void pi_queue_add_task(TaskNode *task_node, TaskQueue *task_queue);
 
-void pi_queue_delete_task(Task *task, TaskQueue *task_queue);
+void pi_queue_delete_task(TaskNode *task_node, TaskQueue *task_queue);
+
+TaskNode *pi_queue_find_node(Task *task, TaskQueue *task_queue);
+
+void pi_queue_destructor(TaskQueue *task_queue);
 
 void task_manager_main_isr(TaskManager *task_manager);
 

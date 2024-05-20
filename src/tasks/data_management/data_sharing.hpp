@@ -3,6 +3,7 @@
 
 #include "tasks.h"
 
+
 typedef struct Mutex {
     Task *locked_by = nullptr;
     TaskQueue awaiting;
@@ -16,9 +17,27 @@ class SharedData {
         Mutex mutex;
     public:
         SharedData(DataType &shared_data);
-        void lock();
-        void release();
-        DataType *access_shared_data();
+        void lock(Task *task);
+        void release(Task *task);
+        DataType *access_shared_data(Task* task);
 };
+
+
+class Signal {
+    private:
+        int run_flag;
+    
+    public:
+        Signal(Task *task)
+        int is_set();
+        void set_high();
+        void set_low();
+}
+
+
+class SystemCommons {
+
+}
+
 
 #endif
