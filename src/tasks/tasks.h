@@ -5,6 +5,7 @@
 
 #include "utils.h"
 
+#define TMC_RESORT_THRESHOLD 4
 
 enum ReturnFlag {
     TASK_AWAITING_SHARED_RESOURCE,
@@ -29,7 +30,6 @@ typedef struct TaskRuntimeData {
 } Task;
 
 typedef struct Task {
-    const 
     const uint8_t priority; // priority value from 0 to 255
     const int tick_interval; // how many ticks apart should each execution be, ideally
     const Operation task_opt; // what function should be run by task
@@ -43,11 +43,16 @@ typedef struct Task {
     Task *higher_priority = NULL;
 } Task;
 
-typedef struct TaskManager {
-    int ticks_from_resort; // ticks since adjusted priorities were calculated and resorted
-    int resort_threshold; // the number of ticks that should elapse before recalculation of priorities and resorting.
-    Task *root_task = NULL
+typedef struct TaskQueue {
+    Task *lowest_priority = NULL;
     Task *highest_priority = NULL;
+} TaskQueue;
+
+typedef struct TaskManager {
+    int ticks_from_resort = 0; // ticks since adjusted priorities were calculated and resorted
+    int resort_threshold = TMC_RESORT_THRESHOLD; // the number of ticks that should elapse before recalculation of priorities and resorting.
+    Task *currently_occupied = NULL;
+    TaskQueue task_queue;
 } TaskManager;
 
 TaskRuntimeData generate_task_runtime_data(int execution_count, int current_execution_ticks, int ticks_from_last_execution, ReturnFlag return_flag);
@@ -68,12 +73,12 @@ int check_task_previous_state(Task *task, TaskManager *task_manager);
 
 int dynamic_task_priority_calculator(Task *task);
 
-void pi_queue_run_task(Task *task, TaskManager *task_manager);
+void pi_queue_sort(TaskQueue *task_queue);
 
-void pi_queue_sort(TaskManager *task_manager);
+void pi_queue_add_task(Task *task, TaskQueue *task_queue);
 
-void pi_queue_add_task(Task *task, TaskManager *task_manager);
+void pi_queue_delete_task(Task *task, TaskQueue *task_queue);
 
-void pi_queue_delete_task(Task *task, TaskManager *task_manager)
+void task_manager_main_isr(TaskManager *task_manager);
 
 #endif

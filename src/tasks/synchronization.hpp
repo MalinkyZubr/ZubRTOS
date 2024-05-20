@@ -4,20 +4,19 @@
 #include "tasks.h"
 
 typedef struct Mutex {
-    bool acquired;
-    Task *acquired_by;
-    PriorityTreeRoot *awaiting;
+    Task *locked_by = nullptr;
+    TaskQueue awaiting;
 } Mutex;
 
 
-template<class DataType>
+template<typename DataType>
 class SharedData {
     private:
-        DataType shared_data;
+        DataType &shared_data;
         Mutex mutex;
     public:
-        SharedData(DataType shared_data)
-        void acquire();
+        SharedData(DataType &shared_data);
+        void lock();
         void release();
         DataType *access_shared_data();
 };

@@ -11,7 +11,7 @@ float modular_exponent(float base, int exponent) {
     else if(exponent % 2 == 0) {
         return exp_by_square(base * base, (exponent - 1) / 2);
     }
-    else if(n % 2 == 1) {
+    else if(exponent % 2 == 1) {
         return base * exp_by_square(base * base, (exponent - 1) / 2);
     }
 }
