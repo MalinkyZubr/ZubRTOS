@@ -34,7 +34,7 @@ void MemorySafeObject<Wrapped>::safe_wrapper_delete(ObjectWrapper<Wrapped> *wrap
     ObjectWrapper<Wrapped> *selected_wrapper = this->first_reference;
     ObjectWrapper<Wrapped> *next_wrapper = nullptr;
 
-    while(wrapper != selected_wrapper && != nullptr) {
+    while(wrapper != selected_wrapper && selected_wrapper != nullptr) {
         previous_wrapper = selected_wrapper;
         selected_wrapper = next_wrapper;
         next_wrapper = selected_wrapper->next();
@@ -58,5 +58,6 @@ MemorySafeObject<Wrapped>::~MemorySafeObject() {
     while(selected_wrapper != nullptr) {
         next_wrapper = selected_wrapper->next();
         delete selected_wrapper;
+        selected_wrapper = next_wrapper;
     }
 }

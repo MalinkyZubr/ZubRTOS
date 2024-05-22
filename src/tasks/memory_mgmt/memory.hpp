@@ -6,7 +6,7 @@ template<typename Wrapped>
 class MemorySafeObject;
 
 
-template<typename Member, typename Wrapper = ObjectWrapper<Member>>
+template<typename Member>
 class MemoryLocation;
 
 
@@ -17,7 +17,6 @@ class ObjectWrapper {
         const MemoryLocation *memory_location;
 
         // for use by the memory safe object
-
         ObjectWrapper *next_internal_wrapper = nullptr;
 
         // for use by shared memory location
@@ -28,14 +27,15 @@ class ObjectWrapper {
         MemorySafeObject<Wrapped> get_memory_safe();
         Wrapped get_wrapped();
 
-        ObjectWrapper get_next_internal_wrapper(MemorySafeObject<Wrapped> requester);
-        void set_next_internal_wrapper(MemorySafeObject<Wrapped> requester, ObjectWrapper<Wrapped> next);
+        // for use by the safe memory object
+        ObjectWrapper<Wrapped>* get_next_internal_wrapper(MemorySafeObject<Wrapped> *requester);
+        void set_next_internal_wrapper(MemorySafeObject<Wrapped> *requester, ObjectWrapper<Wrapped> *next);
 
         // for use by the shared memory location
-        ObjectWrapper next();
-        ObjectWrapper previous();
+        ObjectWrapper<Wrapped>* next();
+        ObjectWrapper<Wrapped>* previous();
         void set_next(ObjectWrapper<Wrapped> *next); 
-        void set_previous(ObjectWrapper<Wrapped> *next);
+        void set_previous(ObjectWrapper<Wrapped> *previous);
         ~ObjectWrapper();
 };
 
