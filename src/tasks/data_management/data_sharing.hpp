@@ -28,7 +28,7 @@ class Signal {
         int run_flag;
     
     public:
-        Signal(Task *task)
+        Signal(Task *task);
         int is_set();
         void set_high();
         void set_low();

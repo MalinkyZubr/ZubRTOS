@@ -37,15 +37,17 @@ typedef struct Task {
     const int ticks_per_execution; // how many ticks is the task allowed to use in a single execution?
     const uint8_t repeat; 
 
-    AssociatedNodes associated_nodes;
+    AssociatedNodeWrapper *associated_node = nullptr;
 
     TaskRuntimeData runtime_data;
 } Task;
 
 
-typedef struct AssociatedNodes {
-    TaskNode* first_association;
-} AssociatedNodes;
+typedef struct AssociatedNodeWrapper {
+    TaskNode* associated_node = nullptr;
+    TaskQueue *task_queue = nullptr;
+    TaskNode* next = nullptr;
+} AssociatedNodeWrapper;
 
 
 typedef struct TaskNode {
@@ -94,6 +96,14 @@ void pi_queue_delete_task(TaskNode *task_node, TaskQueue *task_queue);
 TaskNode *pi_queue_find_node(Task *task, TaskQueue *task_queue);
 
 void pi_queue_destructor(TaskQueue *task_queue);
+
+TaskNode *t_node_create(Task *task, TaskQueue *task_queue);
+
+void a_nodes_append(Task *task, TaskNode *task_node, TaskQueue *task_queue);
+
+void a_nodes_delete(Task *task, TaskNode *task_node);
+
+void a_nodes_delete_all(Task *task);
 
 void task_manager_main_isr(TaskManager *task_manager);
 

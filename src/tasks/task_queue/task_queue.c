@@ -38,12 +38,12 @@ void pi_queue_sort(TaskQueue *task_queue) { // what about if the next has to be 
 
 void pi_queue_add_task(TaskNode *task, TaskQueue *task_queue) {
     TaskNode *new_node = (TaskNode*)malloc(sizeof(TaskNode));
-    TaskNode->owned_task = task;
+    new_node->owned_task = task;
 
     if(task_queue->lowest_priority == NULL) {
         task_queue->lowest_priority = new_node;
         task_queue->highest_priority = new_node;
-    }
+    } 
     else {
         task_queue->lowest_priority->lower_priority = new_node;
         new_node->higher_priority = task_queue->lowest_priority;
