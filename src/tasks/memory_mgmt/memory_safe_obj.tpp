@@ -46,6 +46,7 @@ void MemorySafeObject<Wrapped>::safe_wrapper_delete(ObjectWrapper<Wrapped> *wrap
         else {
             this->first_reference = next_wrapper;
         }
+        delete selected_wrapper
     }
 }
 
