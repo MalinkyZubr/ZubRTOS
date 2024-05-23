@@ -2,8 +2,13 @@
 
 
 template<typename Wrapped>
-ObjectWrapper<Wrapped>::ObjectWrapper(MemorySafeObject<Wrapped> *object, MemoryLocation<Wrapped> *location) {
+ObjectWrapper<Wrapped>::ObjectWrapper(MemorySafeObject<Wrapped> *object, MemoryLocation<Wrapped> *location) : associated_object(object) {
     location->push_member(this);
+}
+
+template<typename Wrapped>
+MemorySafeObject<Wrapped>* ObjectWrapper<Wrapped>::get_associated_object() {
+    return this->associated_object;
 }
 
 template<typename Wrapped>
@@ -42,12 +47,12 @@ void ObjectWrapper<Wrapped>::set_previous(ObjectWrapper<Wrapped> *previous) {
 }
 
 template<typename Wrapped>
-MemorySafeObject<Wrapped> ObjectWrapper<Wrapped>::get_memory_safe() {
+MemorySafeObject<Wrapped>* ObjectWrapper<Wrapped>::get_memory_safe() {
     return this->associated_object;
 }
 
 template<typename Wrapped>
-Wrapped ObjectWrapper<Wrapped>::get_wrapped() {
+Wrapped* ObjectWrapper<Wrapped>::get_wrapped() {
     return this->associated_object->get_wrapped_object();
 }
 

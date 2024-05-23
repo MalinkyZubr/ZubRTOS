@@ -6,7 +6,7 @@ MemorySafeObject<Wrapped>::MemorySafeObject(Wrapped *object) : wrapped_object(ob
 
 
 template<typename Wrapped>
-Wrapped MemorySafeObject<Wrapped>::get_wrapped_object() {
+Wrapped *MemorySafeObject<Wrapped>::get_wrapped_object() {
     return this->wrapped_object;
 }
 
@@ -20,10 +20,10 @@ void MemorySafeObject<Wrapped>::generate_wrapper(MemoryLocation<Wrapped> *wrappe
         this->first_reference = new_wrapper;
     }
     else {
-        while(selected_wrapper->next() != nullptr) {
-            selected_wrapper = selected_wrapper->next();
+        while(selected_wrapper->get_next_internal_wrapper(this) != nullptr) {
+            selected_wrapper = selected_wrapper->get_next_internal_wrapper(this);
         }
-        selected_wrapper->set_next(new_wrapper);
+        selected_wrapper->set_next_internal_wrapper(this, new_wrapper);
     }
 }
 
@@ -37,11 +37,11 @@ void MemorySafeObject<Wrapped>::safe_wrapper_delete(ObjectWrapper<Wrapped> *wrap
     while(wrapper != selected_wrapper && selected_wrapper != nullptr) {
         previous_wrapper = selected_wrapper;
         selected_wrapper = next_wrapper;
-        next_wrapper = selected_wrapper->next();
+        next_wrapper = selected_wrapper->get_next_internal_wrapper(this);
     }
     if(selected_wrapper != nullptr) {
         if(previous_wrapper != nullptr) {
-            previous_wrapper->set_next(next_wrapper);
+            previous_wrapper->set_next_internal_wrapper(this, next_wrapper);
         }
         else {
             this->first_reference = next_wrapper;
@@ -53,10 +53,10 @@ void MemorySafeObject<Wrapped>::safe_wrapper_delete(ObjectWrapper<Wrapped> *wrap
 template<typename Wrapped>
 MemorySafeObject<Wrapped>::~MemorySafeObject() {
     ObjectWrapper<Wrapped> *selected_wrapper= this->first_reference;
-    ObjectWrapper<Wrapped> *next_wrapper= this->first_reference;
+    ObjectWrapper<Wrapped> *next_wrapper= nullptr;
 
     while(selected_wrapper != nullptr) {
-        next_wrapper = selected_wrapper->next();
+        next_wrapper = selected_wrapper->get_next_internal_wrapper(this);
         delete selected_wrapper;
         selected_wrapper = next_wrapper;
     }
