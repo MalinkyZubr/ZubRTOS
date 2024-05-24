@@ -1,6 +1,7 @@
 #ifndef MEMORY_HPP
 #define MEMORY_HPP
 
+#include "../../interrupts/atomic.h"
 
 template<typename Wrapped>
 class MemorySafeObject;
@@ -24,53 +25,72 @@ class ObjectWrapper {
         ObjectWrapper *previous_wrapper = nullptr;
     public:
         ObjectWrapper(MemorySafeObject<Wrapped> *object, MemoryLocation<Wrapped> *location);
+        ~ObjectWrapper();
+
         MemorySafeObject<Wrapped>* get_memory_safe();
         Wrapped* get_wrapped();
         MemorySafeObject<Wrapped>* get_associated_object();
 
         // for use by the safe memory object
-        void memory_object_cancel_reference();
         ObjectWrapper<Wrapped>* get_next_internal_wrapper(MemorySafeObject<Wrapped> *requester);
         void set_next_internal_wrapper(MemorySafeObject<Wrapped> *requester, ObjectWrapper<Wrapped> *next);
 
         // for use by the shared memory location
-        void shared_memory_remove_reference();
         ObjectWrapper<Wrapped>* next();
         ObjectWrapper<Wrapped>* previous();
         void set_next(ObjectWrapper<Wrapped> *next); 
         void set_previous(ObjectWrapper<Wrapped> *previous);
-        ~ObjectWrapper();
+
+        // deletion operations
+        void location_transmit_object_receive_delete();
+        void object_transmit_location_receive_delete();
+};
+
+
+template<typename Member> 
+class SharedMemoryStructure {
+    protected:
+        int reference_count = 0;
+        void ref_count_increment();
+        void ref_count_decrement();
+        virtual ObjectWrapper<Wrapped>* data_structure_delete(ObjectWrapper<Member> *member) {};
+        void graceful_destruction();
+    public:
+        void receive_wrapper_delete_request(ObjectWrapper<Member> *member);
+        virtual void trigger_wrapper_delete_request(ObjectWrapper<Member> *member) {};
 };
 
 
 template<typename Member> // SHOULD ONLY BE DELETED WHEN REFERENCE COUNTER REACHES 0
-class MemoryLocation { // this is where the actual data goes. This is a template datastructure
+class MemoryLocation : private SharedMemoryStructure<Member> { // this is where the actual data goes. This is a template datastructure
     protected:
         ObjectWrapper<Member> *start = nullptr;
+        virtual ObjectWrapper<Member>* data_structure_delete(ObjectWrapper<Member> *member);
     public:
         virtual ObjectWrapper<Member>* get_wrapper(Member *member) {};
         virtual void push_member(ObjectWrapper<Member> *member) {};
-        virtual void delete_member(ObjectWrapper<Member> *member) {};
-        void receive_reference_delete_request(ObjectWrapper<Member> *member);
-        void trigger_reference_delete_request(ObjectWrapper<Member> *member);
-        virtual void graceful_delete() {};
+        void trigger_wrapper_delete_request(ObjectWrapper<Member> *member);
+        
         ~MemoryLocation();
 };
 
 
 template<typename Wrapped> // THIS SHOULD ONLY BE DELETED WHEN THE REFERENCE COUNTER REACHES 0
-class MemorySafeObject { // this is the object's main storage area
+class MemorySafeObject : private SharedMemoryStructure<Wrapped> { // this is the object's main storage area
     public:      
         MemorySafeObject(Wrapped *object);
+        ~MemorySafeObject();
+
         Wrapped* get_wrapped_object();
         void generate_wrapper(MemoryLocation<Wrapped> *wrapper_storage);
-        void safe_wrapper_delete(ObjectWrapper<Wrapped> *wrapper);
-        void delete_wrapper_exterior(ObjectWrapper<Wrapped> *wrapper)
-        ~MemorySafeObject();
+        void trigger_wrapper_delete_request(ObjectWrapper<Wrapped> *member);
 
     private:
         ObjectWrapper<Wrapped> *first_reference = nullptr;
         Wrapped *wrapped_object;
+
+    protected:
+        ObjectWrapper<Wrapped>* data_structure_delete(ObjectWrapper<Wrapped> *wrapper);
 };
 
 

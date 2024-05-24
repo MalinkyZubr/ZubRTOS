@@ -3,7 +3,10 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "/usr/share/arduino/hardware/arduino/avr/**",
+                "/usr/share/arduino/hardware/arduino/avr/cores/arduino/*",
+                "/usr/lib/avr/include/avr/*"
             ],
             "defines": [],
             "cStandard": "c17",

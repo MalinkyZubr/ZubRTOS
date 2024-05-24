@@ -2,9 +2,22 @@
 #define BOARD_H
 
 #include <cstdint>
+//#include <Arduino.h>
+#include "atomic.h"
 
 
 #define OVF_FLAG_VALUE 1
+
+
+class Board {
+    protected:
+        virtual int set_prescaler();
+        virtual int set_timers();
+        virtual int set_interrupts();
+    public:
+        Board();
+};
+
 
 // assuming 16 mhz clock
 enum PrescalerDivisor {

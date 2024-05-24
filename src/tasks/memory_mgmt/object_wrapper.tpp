@@ -57,11 +57,6 @@ Wrapped* ObjectWrapper<Wrapped>::get_wrapped() {
 }
 
 template<typename Wrapped>
-void ObjectWrapper<Wrapped>::memory_object_cancel_reference() {
-    this->memory_location->delete_member(this);
-}
-
-template<typename Wrapped>
 ObjectWrapper<Wrapped>::~ObjectWrapper() {
     this->memory_location->delete_member(this);
     this->associated_object->safe_wrapper_delete(this);

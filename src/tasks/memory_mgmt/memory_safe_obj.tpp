@@ -29,7 +29,19 @@ void MemorySafeObject<Wrapped>::generate_wrapper(MemoryLocation<Wrapped> *wrappe
 
 
 template<typename Wrapped>
-void MemorySafeObject<Wrapped>::safe_wrapper_delete(ObjectWrapper<Wrapped> *wrapper) {
+void MemorySafeObject<Wrapped>::trigger_wrapper_delete_request(ObjectWrapper<Wrapped> *member) {
+    ATOMIC_OPERATION([]() -> void {
+        ObjectWrapper<Wrapped> deleted_wrapper = this->data_structure_delete(member);
+        if(deleted_wrapper != nullptr) {
+            deleted_wrapper->object_transmit_location_receive_delete();
+            delete deleted_wrapper;
+        }}
+    );
+}
+
+
+template<typename Wrapped>
+ObjectWrapper<Wrapped>* MemorySafeObject<Wrapped>::data_structure_delete(ObjectWrapper<Wrapped> *wrapper) {
     ObjectWrapper<Wrapped> *previous_wrapper = nullptr;
     ObjectWrapper<Wrapped> *selected_wrapper = this->first_reference;
     ObjectWrapper<Wrapped> *next_wrapper = nullptr;
@@ -46,8 +58,8 @@ void MemorySafeObject<Wrapped>::safe_wrapper_delete(ObjectWrapper<Wrapped> *wrap
         else {
             this->first_reference = next_wrapper;
         }
-        delete selected_wrapper
     }
+    return selected_wrapper;
 }
 
 
