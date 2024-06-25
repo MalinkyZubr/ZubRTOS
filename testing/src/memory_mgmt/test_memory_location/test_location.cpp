@@ -5,13 +5,10 @@ void TestLocation::push_member(ObjectWrapper<TestMember> *member) {
     this->start = member;
 }
 
-void TestLocation::delete_member(ObjectWrapper<TestMember> *member) {
-    delete member;
+ObjectWrapper<TestMember>* TestLocation::data_structure_delete(ObjectWrapper<TestMember> *member) {
+    ObjectWrapper<TestMember> *temp = this->start;
     this->start = nullptr;
-}
-
-void TestLocation::graceful_delete() {
-    this->delete_member(this->start);
+    return temp;
 }
 
 ObjectWrapper<TestMember>* TestLocation::get_wrapper(TestMember *member) {

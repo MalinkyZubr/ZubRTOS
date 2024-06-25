@@ -1,13 +1,16 @@
 #ifndef SYNCHRONIZATION_H
 #define SYNCHRONIZATION_H
 
-#include "tasks.h"
+#include "memory.hpp"
 
 
 typedef struct Mutex {
     Task *locked_by = nullptr;
     TaskQueue awaiting;
 } Mutex;
+
+
+class Mutex : public MemoryLocation
 
 
 template<typename DataType>
@@ -26,7 +29,6 @@ class SharedData {
 class Signal {
     private:
         int run_flag;
-    
     public:
         Signal(Task *task);
         int is_set();

@@ -2,7 +2,7 @@
 
 
 template<typename Wrapped>
-ObjectWrapper<Wrapped>::ObjectWrapper(MemorySafeObject<Wrapped> *object, MemoryLocation<Wrapped> *location) : associated_object(object) {
+ObjectWrapper<Wrapped>::ObjectWrapper(MemorySafeObject<Wrapped> *object, MemoryLocation<Wrapped> *location) : associated_object(object), memory_location(location) {
     location->push_member(this);
 }
 
@@ -57,7 +57,12 @@ Wrapped* ObjectWrapper<Wrapped>::get_wrapped() {
 }
 
 template<typename Wrapped>
-ObjectWrapper<Wrapped>::~ObjectWrapper() {
-    this->memory_location->delete_member(this);
-    this->associated_object->safe_wrapper_delete(this);
-} // need one delete method to delete from within, and one to delete elsewhere
+void ObjectWrapper<Wrapped>::location_transmit_object_receive_delete() {
+    this->associated_object->receive_wrapper_delete_request(this);
+}
+
+template<typename Wrapped>
+void ObjectWrapper<Wrapped>::object_transmit_location_receive_delete() {
+    this->memory_location->receive_wrapper_delete_request(this);
+}
+

@@ -14,8 +14,9 @@ class TestLocation : public MemoryLocation<TestMember> {
     public:
         ObjectWrapper<TestMember>* get_wrapper(TestMember *member) override;
         void push_member(ObjectWrapper<TestMember> *member) override;
-        void delete_member(ObjectWrapper<TestMember> *member) override;
-        void graceful_delete() override;
+        ObjectWrapper<TestMember>* get_first(TestMember *member);
+    protected:
+        ObjectWrapper<TestMember>* data_structure_delete(ObjectWrapper<TestMember> *member) override;
 };
 
 

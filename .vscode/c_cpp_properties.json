@@ -6,7 +6,10 @@
                 "${workspaceFolder}/**",
                 "/usr/share/arduino/hardware/arduino/avr/**",
                 "/usr/share/arduino/hardware/arduino/avr/cores/arduino/*",
-                "/usr/lib/avr/include/avr/*"
+                "/usr/lib/avr/include/avr/*",
+                "/home/malinkyzubr/.arduino15/packages/arduino/hardware/avr/1.8.6/cores/arduino/**",
+                "/usr/lib/avr/include/**",
+                "/home/malinkyzubr/.arduino15/packages/arduino/hardware/avr/1.8.6/variants/standard/**"
             ],
             "defines": [],
             "cStandard": "c17",

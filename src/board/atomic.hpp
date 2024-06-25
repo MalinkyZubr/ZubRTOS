@@ -5,6 +5,14 @@
 
 #define ATOMIC_TEST 1
 
+#ifndef cli
+#define cli() {}
+#endif
+
+#ifndef sei
+#define sei() {}
+#endif
+
 
 template<typename Func>
 void ATOMIC_OPERATION(Func func);
